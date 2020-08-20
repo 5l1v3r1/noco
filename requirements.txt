@@ -1,0 +1,9 @@
+requests
+flask
+oauth2
+environs
+Flask-Mail
+beautifulsoup4
+celery==4.4.7
+gunicorn
+sentry-sdk[flask]==0.16.2
