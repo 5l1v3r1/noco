@@ -2,6 +2,7 @@ import logging
 import sys
 
 from flask import Flask, jsonify, current_app, request
+from werkzeug.utils import import_string
 
 from noco.diffbot import DiffbotClient
 from noco.extensions import mail, note, celery
@@ -79,12 +80,18 @@ def register_blueprints(app: Flask):
         return jsonify({"title": title, "content": html})
 
 
-def create_app(config_object="noco.settings"):
+def create_app(config_path="noco.settings"):
     """Create application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
-    :param config_object: The configuration object to use.
+    :param config_path: The configuration object to use.
     """
+
+    config_obj = import_string(config_path)
+    config_object = {}
+    for key in dir(config_path):
+        if key.isupper():
+            config_object[key] = getattr(config_obj, key)
     app = Flask(__name__.split(".")[0])
-    app.config.from_object(config_object)
+    app.config.from_object(config_obj)
     register_extensions(app)
     register_blueprints(app)
     register_errorhandlers(app)
